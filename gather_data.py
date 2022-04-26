@@ -1,6 +1,5 @@
 import cv2
 import os
-import sys
 # Define a function to gather data for each type
 
 cwd = os.getcwd()
@@ -9,7 +8,7 @@ cwd = os.getcwd()
 def get_data(sample_count, image_type):
   capture = cv2.VideoCapture(0)
   start = False
-  count = 601
+  count = 0
   while True:
     ret, frame = capture.read() 
     cv2.namedWindow('frame', cv2.WINDOW_NORMAL)
@@ -45,4 +44,4 @@ def get_data(sample_count, image_type):
 # get_data(800, "rock")
 # get_data(800, "paper")
 # get_data(800, "scissors")
-get_data(800, "none")
+# get_data(800, "none")
