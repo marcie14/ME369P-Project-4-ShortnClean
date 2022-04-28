@@ -2,8 +2,8 @@
 M E 369P - Team 4 - Short n' Clean 
 Allen Hewson, Brenda Miltos, Marcie Legarde, Pranay Srivastava
 
-Model/CV File:
-    This file trains a model on RPS hand image data and 
+Performance Analysis File:
+    This file ties together all the files for this project
 
 '''
 
