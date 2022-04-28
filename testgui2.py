@@ -9,6 +9,8 @@ GUI File:
         -Winner/Loser Comments
         -Not-So-Random computer hand selection
         -Incorporating OpenCV for Main File
+
+FUSED RECOGNIZED_EDGE AND PROJECT_GUI AND RESOURCE FROM INTERNET
 '''
 
 # importing used libraries
