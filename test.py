@@ -111,7 +111,7 @@ def game():
                             (200, 250), font,
                             7, (0, 255, 255),
                             4, cv2.LINE_AA)
-                cv2.imshow('a', img)
+                cv2.imshow('Rock Paper Scissors', img)
                 cv2.waitKey(10)
 
                 # Current Time 
@@ -131,7 +131,7 @@ def game():
                 # sec.You can increase time in
                 # waitKey also
                 # cv2.imshow('a', img)
-                cv2.imshow("Rock Paper Scissors", frame)
+                cv2.imshow('Rock Paper Scissors', frame)
  
                 # time for which image displayed
                 cv2.waitKey(2000)
@@ -144,6 +144,10 @@ def game():
                 # HERE we can reset the Countdown timer
                 # if we want more Capture without closing
                 # the camera
+
+                TIMER = 5
+
+
 
         elif k == ord('q'):
             break
