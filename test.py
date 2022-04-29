@@ -8,7 +8,18 @@ import tensorflow as tf
 keras = tf.keras
 import numpy as np
 from random import choice
+import time
+import os  
 
+# Create folder where we can capture player's move 
+
+Datos = 'Player Move'
+if not os.path.exists(Datos):
+    print('Carpeta creada ', Datos)
+    os.makedirs(Datos)
+
+# Number of photos taken 
+photo_of_move = 0
 
 def visualizar():
     global cap
@@ -40,15 +51,34 @@ def game():
     def mapper(val):
         return CLASS_MAP[val]
 
+    # SET THE COUNTDOWN TIMER
+    # for simplicity we set it to 5
+    # We can also take this as input
+    TIMER = int(5)
+
+    # Open the camera
     cap = cv2.VideoCapture(0)
+    x1, y1 = 25, 25
+    x2, y2 = 300, 300 
 
     while True:
+
+        # Read and display frame 
         ret, frame = cap.read()
+        # cv2.imshow('a', img)  
         if not ret:
             continue
+        
+        imAux = frame.copy()
+        # Check for the pressed key 
+        # Waits 125 miliseconds to see if someone pressed any key 
+        # k = cv2.waitKey(125)
 
         # rectangle for user to play
         cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
+
+        objeto = imAux[y1:y2, x1:x2]
+        objeto = imutils.resize (objeto, width = 38)
         
         # extract the region of image within the user rectangle
         player_move = frame[25:300, 25:300]
@@ -65,10 +95,60 @@ def game():
 
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
+       
+        # set the key for the countdown to begin, here we set it as s 
         k = cv2.waitKey(10)
-        if k == ord('q'):
+        if k == ord('s'):
+            prev = time.time()
+
+            while TIMER >=0:
+                ret, img = cap.read()
+
+                # Display countdown on each frame 
+                # Specify the font and draw the coundown 
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(img, str(TIMER),
+                            (200, 250), font,
+                            7, (0, 255, 255),
+                            4, cv2.LINE_AA)
+                cv2.imshow('a', img)
+                cv2.waitKey(10)
+
+                # Current Time 
+                cur = time.time()
+
+                # Update and keep track of Countdown
+                # if time elapsed is one second
+                # than decrease the counter
+                if cur-prev >= 1:
+                    prev = cur
+                    TIMER = TIMER-1
+
+            else: 
+                ret, frame = cap.read()
+
+                # Display the clicked frame for 2
+                # sec.You can increase time in
+                # waitKey also
+                # cv2.imshow('a', img)
+                cv2.imshow("Rock Paper Scissors", frame)
+ 
+                # time for which image displayed
+                cv2.waitKey(2000)
+ 
+                # Save the frame
+                # cv2.imwrite('camera.jpg', frame)
+                # This will capture the image that was just in the box 
+                cv2.imwrite(Datos+'/objeto_{}.jpg'.format(photo_of_move),objeto)
+ 
+                # HERE we can reset the Countdown timer
+                # if we want more Capture without closing
+                # the camera
+
+        elif k == ord('q'):
             break
         cv2.imshow("Rock Paper Scissors", frame)
+
     cap.release()
     cv2.destroyAllWindows()
 
