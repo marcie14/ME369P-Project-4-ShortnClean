@@ -38,7 +38,6 @@ def camera():
     global frame
     global cam
     cam = cv2.VideoCapture(0)
-    #cv2.namedWindow("Experience_in_AI camera")
     while True:
         ret, frame = cam.read()
         if not ret:
@@ -58,7 +57,7 @@ def camera():
         # extracting region of image within rectangle
         player_move = frame[25:300, 25:300]
         rect = cv2.cvtColor(player_move, cv2.COLOR_BGR2RGB)
-        rect = cv2.cvtColor(rect, cv2.COLOR_BGR2RGB)
+        #rect = cv2.cvtColor(rect, cv2.COLOR_BGR2RGB)
         rect = cv2.resize(rect, (224, 224))
         rect_blur = cv2.GaussianBlur(rect, (3,3), 0)
         sobelxy = cv2.Sobel(src=rect_blur, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=5)
@@ -67,7 +66,7 @@ def camera():
         pred = model.predict(np.array([sobelxy]))
         player_move_code = np.argmax(pred[0])
         player_move_name = mapper(player_move_code)
-        
+
         
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
