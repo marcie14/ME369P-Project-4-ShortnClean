@@ -1,19 +1,52 @@
+'''
+M E 369P - Team 4 - Short n' Clean 
+Allen Hewson, Brenda Miltos, Marcie Legarde, Pranay Srivastava
+
+GUI File:
+    This file creates the GUI for the game of rock paper scissors
+    Much of this file was extrapolated from https://pythonistaplanet.com/rock-paper-scissors-game-using-python-tkinter/
+    Changes made for this project: 
+        -Winner/Loser Comments
+        -Not-So-Random computer hand selection
+        -Incorporating OpenCV for Main File
+
+
+FLOW OF CODE:
+1. create a live window and gui
+2. player chooses easy or hard -> goes to that loop
+3. player presses 's' to screenshot hand
+4. computer detects and predicts players hand
+5. computer calls on player_hand, passing predicted players hand
+6. rock paper or scissors is called depending on hand
+7. computer hand is decided (either randomly or by cheating)
+8. results is called on to determine winner 
+
+'''
+# import required libraries
 from tkinter import *
 from tkinter import filedialog
 from PIL import Image
 from PIL import ImageTk
 import cv2
 import imutils
+from platformdirs import user_cache_dir
 import tensorflow as tf
 keras = tf.keras
 import numpy as np
 from random import choice
 import time
 import os 
+import random
 
 # We might not need this part 
 # Create folder where we can capture player's move 
 Datos = 'Player Move'
+mode = '' # variable to store difficulty chosen by user
+
+# initializing global variables
+USER_SCORE = 0      # keeps track of user's score for RPS game
+COMP_SCORE = 0      # keeps track of computer's score for RPS game
+
 if not os.path.exists(Datos):
     print('Carpeta creada ', Datos)
     os.makedirs(Datos)
@@ -21,6 +54,8 @@ if not os.path.exists(Datos):
 # Number of photos taken 
 photo_of_move = 0
 
+
+# function to create easy mode game
 def EasyMode():
     '''
     For this mode, the computer's outcome will be comepletly randomized
@@ -80,7 +115,7 @@ def EasyMode():
         player_move_code = np.argmax(pred[0])
         player_move_name = mapper(player_move_code)
         # print(user_move_name)
-
+        
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
        
@@ -128,6 +163,9 @@ def EasyMode():
                 # cv2.imwrite('camera.jpg', frame)
                 # This will capture the image that was just in the box 
                 cv2.imwrite(Datos+'/objeto_{}.jpg'.format(photo_of_move),objeto)
+
+                # use player's hand to begin game
+                player_hand(player_move_name)
  
                 # HERE we can reset the Countdown timer
                 # if we want more Capture without closing
@@ -173,6 +211,7 @@ def EasyMode():
     cap.release()
     cv2.destroyAllWindows()
 
+# function to create hard mode game
 def HardMode():
     '''
     For this mode, the computer will win every time. 
@@ -280,6 +319,9 @@ def HardMode():
                 # This will capture the image that was just in the box 
                 cv2.imwrite(Datos+'/objeto_{}.jpg'.format(photo_of_move),objeto)
  
+                # use player's hand to begin game
+                player_hand(player_move_name)
+
                 # HERE we can reset the Countdown timer
                 # if we want more Capture without closing
                 # the camera
@@ -327,18 +369,141 @@ def HardMode():
     cap.release()
     cv2.destroyAllWindows()
 
+# random win statement
+def random_win_statement():
+    r = random.randint(1,5)
+    match r:
+        case 1:
+            statement = 'That was all luck...'
+        case 2:
+            statement = 'You got lucky'
+        case 3:
+            statement = 'I let you win that one...'
+        case 4:
+            statement = 'Your awkward hands were distracting me...'
+        case 5:
+            statement = 'You cheated!'
+    return statement
 
+# random lose statement
+def random_lose_statement():
+    r = random.randint(1,5)
+    match r:
+        case 1:
+            statement = 'Ha I dont even have hands and I won'
+        case 2:
+            statement = 'Like playing against a baby'
+        case 3:
+            statement = 'You kinda suck'
+        case 4:
+            statement = 'Do you even know how to play?'
+        case 5:
+            statement = 'How many times do I have to tell you? Paper beats Rock beats Scissors beats Paper!'
+    return statement
 
+# button to call on easy mode
 def Easy():
     global cap 
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    mode = 'Easy'
     EasyMode()
 
+# button to call on hard mode
 def Hard():
     global cap
     cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    mode = 'Hard'
     HardMode()
 
+# function to decipher player move and call rock/paper/scissors functions
+def player_hand(user):
+    if user == 'rock':
+        rock()
+    elif user == 'paper':
+        paper()
+    elif user == 'scissors':
+        scissors()
+    elif user == 'none':
+        print("Error: computer couldn't read user's hand.")
+    else:
+        print("Error: user hand variable empty.")
+
+# function to decide random computer choice for easy mode
+def random_computer_choice():
+    return random.choice(['rock','paper','scissors']) 
+
+# function to decide computer hand if user plays rock
+def rock():
+    user_hand ='rock'
+    comp_hand = ''
+    if mode == 'Easy':     # Easy Mode
+        comp_hand = random_computer_choice() 
+    elif mode == 'Hard':   # Hard Mode
+        comp_hand ='paper'
+    return result(user_hand, comp_hand)
+
+# function to decide computer hand if user plays paper
+def paper():
+    user_hand ='paper'
+    comp_hand = ''
+    if mode == 'Easy':     # Easy Mode
+        comp_hand = random_computer_choice() 
+    elif mode == 'Hard':   # Hard Mode
+        comp_hand ='scissors'
+    return result(user_hand, comp_hand)
+
+# function to decide computer hand if user plays scissors
+def scissors():
+    comp_hand = ''
+    user_hand = 'scissors'
+    if mode == 'Easy':     # Easy Mode
+        comp_hand = random_computer_choice() 
+    elif mode == 'Hard':   # Hard Mode
+        comp_hand ='rock'
+    return result(user_hand, comp_hand)
+
+# converts choice (string) to number (int) - used by results(user, comp) function
+def choice_to_number(choice):
+    rps = {'rock':0, 'paper':1, 'scissors':2}
+    return rps[choice]
+
+#def number_to_choice(number):
+#    rps={0:'rock',1:'paper',2:'scissors'}
+#    return rps[number]
+
+# function to process results of user and computer choices
+def result(user, comp):
+    # convert user and comp hands to numbers
+    user = choice_to_number(user)
+    comp = choice_to_number(comp)
+
+    if(user==comp):
+        print("Tie") ################################################## NEED TO PRINT TO GUI
+    
+    elif((user-comp)%3==1):
+        print("You win") ################################################## NEED TO PRINT TO GUI
+
+        # getting random win statement
+        s = random_win_statement()
+        print(s) ################################################## NEED TO PRINT TO GUI
+        U = 1
+        C = 0
+    
+    else:
+        print("Comp wins") ################################################## NEED TO PRINT TO GUI
+        # getting random lose statement
+        s = random_lose_statement()
+        print(s) ################################################## NEED TO PRINT TO GUI
+        U = 0
+        C = 1
+
+    # adjusting text on window    
+    #text_area = tk.Text(master=window,height=12,width=30,bg="#FFFF99")
+    #text_area.grid(column=0,row=4)
+    answer = "Your Choice: {uc} \nComputer's Choice : {cc} \n Your Score : {u} \n Computer Score : {c} ".format(uc=user,cc=comp,u=USER_SCORE,c=COMP_SCORE)    
+    print(answer)
+    #text_area.insert(tk.END,answer)
+    return (U, C)
 
 cap = None 
 root = Tk()
