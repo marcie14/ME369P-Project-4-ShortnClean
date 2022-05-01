@@ -1,34 +1,13 @@
-'''
-M E 369P - Team 4 - Short n' Clean 
-Allen Hewson, Brenda Miltos, Marcie Legarde, Pranay Srivastava
-
-GUI File:
-    This file creates the GUI for the game of rock paper scissors
-    Much of this file was extrapolated from https://pythonistaplanet.com/rock-paper-scissors-game-using-python-tkinter/
-    Changes made for this project: 
-        -Winner/Loser Comments
-        -Not-So-Random computer hand selection
-        -Incorporating OpenCV for Main File
-
-FUSED RECOGNIZED_EDGE AND PROJECT_GUI AND RESOURCE FROM INTERNET
-'''
-
-# importing used libraries
+import tensorflow as tf
+keras = tf.keras
+import cv2
+import numpy as np
+from random import choice
 from sre_parse import State
 import tkinter as tk
 import random
-import numpy as np
-from PIL import Image, ImageTk
-import cv2
-import tensorflow as tf
-keras = tf.keras
 
 model = keras.models.load_model("rpsedge2.h5")
-
-# importing referenced files
-#from project_modelCV import *
-#from project_main import *
-#from recognize_edge import * # importing modelCV file
 
 CLASS_MAP =  {
     0: "rock",
@@ -40,97 +19,46 @@ CLASS_MAP =  {
 def mapper(val):
     return CLASS_MAP[val]
 
-# creating game window
+# creating live video feed with CV
+cap = cv2.VideoCapture(0)
+
+# creating game window using Tkinter
 window = tk.Tk()
-#window.geometry("400x400")
+window.geometry("400x400")
 window.title("Rock Paper Scissors Game") 
 
-# from test GUI
-frame=np.random.randint(0,255,[100,100,3],dtype='uint8')
-img = ImageTk.PhotoImage(Image.fromarray(frame))
+while True:
+    ret, frame = cap.read()
+    if not ret:
+        continue
 
-panel_img = tk.Label(window) #,image=img)
-panel_img.grid(row=0,column=0,columnspan=3,pady=1,padx=10)
-
-message="Press Play to Begin!"
-panel_text=tk.Label(window,text=message)
-panel_text.grid(row=1,column=1,pady=1,padx=10)
-
-# end from test GUI
-
-global cam
-
-def camera():
-    global frame
-    global cam
-    cam = cv2.VideoCapture(0)
-
-    while True:
-        ret, frame = cam.read()
-
-        # rectangle for user to play
-        cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
+    # rectangle for user to play
+    cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
     
-        # extract the region of image within the user rectangle
-        player_move = frame[25:300, 25:300]
-        panel_img = cv2.cvtColor(player_move, cv2.COLOR_BGR2GRAY)
-        panel_img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        panel_img = cv2.resize(img, (224, 224))
-        img_blur = cv2.GaussianBlur(img, (3,3), 0)
-        sobelxy = cv2.Sobel(src=img_blur, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=5)
-        img_update = ImageTk.PhotoImage(Image.fromarray(panel_img))
-        panel_img.configure(image=img_update)
-        panel_img.image=img_update
-        panel_img.update()
+    # extract the region of image within the user rectangle
+    player_move = frame[25:300, 25:300]
+    rect = cv2.cvtColor(player_move, cv2.COLOR_BGR2GRAY)
+    rect = cv2.cvtColor(rect, cv2.COLOR_BGR2RGB)
+    rect = cv2.resize(rect, (224, 224))
+    rect_blur = cv2.GaussianBlur(rect, (3,3), 0)
+    sobelxy = cv2.Sobel(src=rect_blur, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=5)
+    # predict the move made
+    pred = model.predict(np.array([sobelxy]))
+    player_move_code = np.argmax(pred[0])
+    player_move_name = mapper(player_move_code)
+    # print(user_move_name)
 
-        # predict the move made
-        pred = model.predict(np.array([sobelxy]))
-        player_move_code = np.argmax(pred[0])
-        player_move_name = mapper(player_move_code)
-        #print(user_move_name)
-
-        font = cv2.FONT_HERSHEY_SIMPLEX
-        cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
-
-        if not ret:
-            print("failed to grab frame")
-            break
-
-        k = cv2.waitKey(1)
-        if k%256 == 27:
-            # ESC pressed
-            print("Escape hit, closing...")
-
-            cam.release()
-            cv2.destroyAllWindows()
-            break
-        cv2.imshow("Rock Paper Scissors", frame)
-
-def stop():
-    global cam
-    cam.release()
-    cv2.destroyAllWindows()
-    print("Stopped!")
-
-
-# start button
-handle_height=10
-handle_1=tk.Button(window,text="Play",command=camera,height=5,width=20)
-handle_1.grid(row=1,column=0,pady=10,padx=10)
-handle_1.config(height=1*handle_height,width=20)
-
-# stop button
-handle_height=10
-handle_1=tk.Button(window,text="Exit",command=stop,height=5,width=20)
-handle_1.grid(row=1,column=2,pady=10,padx=10)
-handle_1.config(height=1*handle_height,width=20)
-
-window.mainloop()
+    font = cv2.FONT_HERSHEY_SIMPLEX
+    cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
+    k = cv2.waitKey(10)
+    if k == ord('q'):
+        break
+    cv2.imshow("Rock Paper Scissors", frame)
 
 # initializing global variables
 USER_SCORE = 0      # keeps track of user's score for RPS game
 COMP_SCORE = 0      # keeps track of computer's score for RPS game
-USER_CHOICE = ""#player_move_name    # initialize user choice variable using variable from recognize_edge.py
+USER_CHOICE = player_move_name    # initialize user choice variable using variable from recognize_edge.py
 COMP_CHOICE = ""    # initialize computer choice variable
 
 
@@ -241,4 +169,8 @@ def scissor():
 #button3 = tk.Button(text="      Scissors     ",bg="lightgreen",command=scissors)
 #button3.grid(column=0,row=3)
 
-#window.mainloop()
+window.mainloop()
+
+# closing CV windows
+cap.release()
+cv2.destroyAllWindows()
