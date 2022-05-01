@@ -75,7 +75,7 @@ def EasyMode():
         return CLASS_MAP[val]
 
     # SET THE COUNTDOWN TIMER
-    # for simplicity we set it to 5
+    # for simplicity we set it to 3
     # We can also take this as input
     TIMER = int(3)
 
