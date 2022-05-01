@@ -78,7 +78,7 @@ def game():
         cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
 
         objeto = imAux[y1:y2, x1:x2]
-        objeto = imutils.resize (objeto, width = 38)
+        # objeto = imutils.resize (objeto, width = 100)
         
         # extract the region of image within the user rectangle
         player_move = frame[25:300, 25:300]
