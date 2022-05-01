@@ -54,7 +54,7 @@ def game():
     # SET THE COUNTDOWN TIMER
     # for simplicity we set it to 5
     # We can also take this as input
-    TIMER = int(5)
+    TIMER = int(3)
 
     # Open the camera
     cap = cv2.VideoCapture(0)
@@ -134,7 +134,7 @@ def game():
                 cv2.imshow('Rock Paper Scissors', frame)
  
                 # time for which image displayed
-                cv2.waitKey(2000)
+                cv2.waitKey(1000)
  
                 # Save the frame
                 # cv2.imwrite('camera.jpg', frame)
@@ -145,7 +145,24 @@ def game():
                 # if we want more Capture without closing
                 # the camera
 
-                TIMER = 5
+                ######## New Code ###########
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                org = (50, 50)
+                color = (255, 0, 0)
+                # Line thickness of 2 px
+                thickness = 2
+                image = cv2.putText(frame, 'JUST WHEN YOU THOUGHT', org, font, 
+                   1, color, thickness, cv2.LINE_AA)
+
+                # cv2.waitKey(4000)
+
+                # Displaying the image
+                cv2.imshow('Rock Paper Scissors', image) 
+                cv2.waitKey(4000)
+                ##################################################
+
+
+                TIMER = 3
 
 
 
