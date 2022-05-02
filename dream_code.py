@@ -135,7 +135,7 @@ def random_win_statement():
         case 3:
             statement = 'I let you win that one...'
         case 4:
-            statement = 'Your awkward hands were distracting me...'
+            statement = 'Your awkward hands were\ndistracting me...'
         case 5:
             statement = 'You cheated!'
     return statement
@@ -145,15 +145,15 @@ def random_lose_statement():
     r = random.randint(1,5)
     match r:
         case 1:
-            statement = 'Ha I dont even have hands and I won'
+            statement = 'Ha I dont even have hands\nand I won! XD'
         case 2:
-            statement = 'Like playing against a baby'
+            statement = 'Like playing against\na baby... XD'
         case 3:
-            statement = 'You kinda suck'
+            statement = 'You kinda suck... XD'
         case 4:
-            statement = 'Do you even know how to play?'
+            statement = 'Do you even know how\nto play? XD'
         case 5:
-            statement = 'How many times do I have to tell you?\nPaper beats Rock beats Scissors beats Paper!'
+            statement = 'How many times do I have to\ntell you? Paper beats Rock beats\nScissors beats Paper! XD'
     return statement
 
 # function to process results of user and computer choices
@@ -333,7 +333,7 @@ def EasyMode():
                 # Line thickness of 2 px
                 thickness = 2
 
-                y0, dy = 50, 25
+                y0, dy = 50, 30
                 for i, line in enumerate(r.split('\n')):
                     y = y0 + i*dy
                     image = cv2.putText(frame, line, (50, y ), font, 1, color, thickness)
@@ -344,7 +344,7 @@ def EasyMode():
 
                 # Displaying the image
                 cv2.imshow('Rock Paper Scissors', image) 
-                cv2.waitKey(10000)
+                cv2.waitKey(5000)
 
                 #################################################
                 TIMER = 3
@@ -512,7 +512,7 @@ def HardMode():
                 # Line thickness of 2 px
                 thickness = 2
 
-                y0, dy = 50, 25
+                y0, dy = 50, 30
                 for i, line in enumerate(r.split('\n')):
                     y = y0 + i*dy
                     image = cv2.putText(frame, line, (50, y ), font, 1, color, thickness)
@@ -523,7 +523,7 @@ def HardMode():
 
                 # Displaying the image
                 cv2.imshow('Rock Paper Scissors', image) 
-                cv2.waitKey(10000)
+                cv2.waitKey(5000)
 
                 TIMER = 3
 
