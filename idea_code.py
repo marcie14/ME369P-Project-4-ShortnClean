@@ -58,31 +58,6 @@ def choice_to_number(choice):
     rps = {'rock':0, 'paper':1, 'scissors':2}
     return rps[choice]
 
-# function to process results of user and computer choices
-
-def result(user, comp):
-    global user_score
-    global comp_score
-    global comp_hand
-    global user_hand
-    print('getting the results')
-    # convert user and comp hands to numbers
-    user = choice_to_number(user)
-    comp = choice_to_number(comp)
-
-    if(user==comp):
-        print('tie')
-        results_statement = 'User: ' + user_hand + '\n + Comp: ' + comp_hand + '\n\nTie\n\nUser Score: ' + str(user_score) + '\nComp Score: ' + str(comp_score)
-    elif((user-comp)%3==1):
-        print('user wins')
-        user_score += 1
-        results_statement = 'User: ' + user_hand + '\n + Comp: ' + comp_hand + '\n\nUser Wins\n' + random_win_statement() + '\n\nUser Score: ' + str(user_score) + '\nComp Score: ' + str(comp_score)
-    else:
-        print('comp wins')
-        comp_score += 1
-        results_statement = 'User: ' + user_hand + '\n + Comp: ' + comp_hand + '\n\nComp Wins\n' + random_lose_statement() + '\n\nUser Score: ' + str(user_score) + '\nComp Score: ' + str(comp_score)
-    return results_statement
-
 # function to decipher player move and call rock/paper/scissors functions
 def player_hand(user):
     print('user hand: ' + user)
@@ -116,7 +91,7 @@ def rock():
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='paper'
     print('comp hand: ' + comp_hand)
-    return result(user_hand, comp_hand)
+    return
 
 # function to decide computer hand if user plays paper
 def paper():
@@ -129,7 +104,7 @@ def paper():
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='scissors'
     print('comp hand: ' + comp_hand)
-    return result(user_hand, comp_hand)
+    return
 
 # function to decide computer hand if user plays scissors
 def scissors():
@@ -142,7 +117,63 @@ def scissors():
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='rock'
     print('comp hand: ' + comp_hand)
-    return result(user_hand, comp_hand)
+    return
+
+# random win statement
+def random_win_statement():
+    r = random.randint(1,5)
+    match r:
+        case 1:
+            statement = 'That was all luck...'
+        case 2:
+            statement = 'You got lucky'
+        case 3:
+            statement = 'I let you win that one...'
+        case 4:
+            statement = 'Your awkward hands were distracting me...'
+        case 5:
+            statement = 'You cheated!'
+    return statement
+
+# random lose statement
+def random_lose_statement():
+    r = random.randint(1,5)
+    match r:
+        case 1:
+            statement = 'Ha I dont even have hands and I won'
+        case 2:
+            statement = 'Like playing against a baby'
+        case 3:
+            statement = 'You kinda suck'
+        case 4:
+            statement = 'Do you even know how to play?'
+        case 5:
+            statement = 'How many times do I have to tell you? Paper beats Rock beats Scissors beats Paper!'
+    return statement
+
+# function to process results of user and computer choices
+def result(user, comp):
+    global user_score
+    global comp_score
+    global comp_hand
+    global user_hand
+    print('getting the results')
+    # convert user and comp hands to numbers
+    user = choice_to_number(user)
+    comp = choice_to_number(comp)
+
+    if(user==comp):
+        print('tie')
+        results_statement = 'User: ' + user_hand + '\n + Comp: ' + comp_hand + '\n\nTie\n\nUser Score: ' + str(user_score) + '\nComp Score: ' + str(comp_score)
+    elif((user-comp)%3==1):
+        print('user wins')
+        user_score += 1
+        results_statement = 'User: ' + user_hand + '\n + Comp: ' + comp_hand + '\n\nUser Wins\n' + random_win_statement() + '\n\nUser Score: ' + str(user_score) + '\nComp Score: ' + str(comp_score)
+    else:
+        print('comp wins')
+        comp_score += 1
+        results_statement = 'User: ' + user_hand + '\n + Comp: ' + comp_hand + '\n\nComp Wins\n' + random_lose_statement() + '\n\nUser Score: ' + str(user_score) + '\nComp Score: ' + str(comp_score)
+    return results_statement
 
 # function to create easy mode game
 def EasyMode():
@@ -277,7 +308,7 @@ def EasyMode():
                 user_hand = player_move_name
 
                 # use player's hand to begin game
-                r = player_hand(user_hand) # calls on results (returns string) 
+                r = result(user_hand, comp_hand) # calls on result function (returns string) 
                 
                 print(r)
                 
@@ -446,7 +477,7 @@ def HardMode():
                 user_hand = player_move_name
 
                 # use player's hand to begin game
-                r = player_hand(user_hand) # calls on results (returns string)
+                r = result(user_hand, comp_hand) # calls on results (returns string) 
                 
                 print(r)
 
@@ -479,38 +510,6 @@ def HardMode():
     cap.release()
     cv2.destroyAllWindows()
 
-# random win statement
-def random_win_statement():
-    r = random.randint(1,5)
-    match r:
-        case 1:
-            statement = 'That was all luck...'
-        case 2:
-            statement = 'You got lucky'
-        case 3:
-            statement = 'I let you win that one...'
-        case 4:
-            statement = 'Your awkward hands were distracting me...'
-        case 5:
-            statement = 'You cheated!'
-    return statement
-
-# random lose statement
-def random_lose_statement():
-    r = random.randint(1,5)
-    match r:
-        case 1:
-            statement = 'Ha I dont even have hands and I won'
-        case 2:
-            statement = 'Like playing against a baby'
-        case 3:
-            statement = 'You kinda suck'
-        case 4:
-            statement = 'Do you even know how to play?'
-        case 5:
-            statement = 'How many times do I have to tell you? Paper beats Rock beats Scissors beats Paper!'
-    return statement
-
 # button to call on easy mode
 def Easy():
     global cap 
@@ -528,18 +527,6 @@ def Hard():
     mode = 'Hard'
     print('Entering ' + mode + ' mode')
     HardMode()
-
-
-    global comp_hand 
-    global user_hand
-    comp_hand = ''
-    user_hand = 'scissors'
-    if mode == 'Easy':     # Easy Mode
-        comp_hand = random_computer_choice() 
-    elif mode == 'Hard':   # Hard Mode
-        comp_hand ='rock'
-    print('comp hand: ' + comp_hand)
-    return result(user_hand, comp_hand)
 
 cap = None 
 root = Tk()
