@@ -1,10 +1,17 @@
+#M E 369P - Team 4 - Short n' Clean 
+#Allen Hewson, Brenda Miltos, Marcie Legarde, Pranay Srivastava
+#Edge Detection File:
+#    This file prepares images to train the model using edge detection 
+
+#importing required libraries
 from asyncore import write
 import cv2
 import os
-folders = ["rock", "paper", "scissors", "none"]
+
+folders = ["Cow", "Snake", "Bird", "None"]    # change to what you want your folder names to be
 for folder in folders:
-  dir = f"C:/Users/daich/OneDrive/Documents/ME 369P RPS Project/{folder}"
-  new_dir = f"C:/Users/daich/OneDrive/Documents/ME 369P RPS Project/{folder}edge"
+  dir = f"D:\marci\Documents\Desktop\ME\ME369P-Project-4-ShortnClean\{folder}"          # change to your file path
+  new_dir = f"D:\marci\Documents\Desktop\ME\ME369P-Project-4-ShortnClean\{folder}edge"  # change to your file path
   for item in os.listdir(dir):
       if item.endswith("jpg"):
         img = cv2.imread(os.path.join(dir, item))

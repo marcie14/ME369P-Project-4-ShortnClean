@@ -5,8 +5,9 @@
 #    Much of this file was extrapolated from https://pythonistaplanet.com/rock-paper-scissors-game-using-python-tkinter/
 #    Changes made for this project: 
 #        -Winner/Loser Comments
-#        -Not-So-Random computer hand selection
-#        -Incorporating OpenCV for Main File
+#        -Easy (random) and Hard (cheat) mode
+#        -Not-So-Random computer hand selection for Hard Mode
+#        -Incorporating OpenCV and trained model 
 #FLOW OF CODE:
 #1. create a live window and gui
 #2. player chooses easy or hard -> goes to that loop
@@ -25,7 +26,7 @@ from PIL import Image
 from PIL import ImageTk
 import cv2
 import imutils
-#from platformdirs import user_cache_dir
+from platformdirs import user_cache_dir
 import tensorflow as tf
 keras = tf.keras
 import numpy as np
@@ -36,7 +37,7 @@ import random
 
 # We might not need this part 
 # Create folder where we can capture player's move 
-Datos = 'Player Move'
+Data = 'Player Move'
 mode = '' # variable to store difficulty chosen by user
 
 # initializing global variables
@@ -45,9 +46,9 @@ user_hand = ''      # keeps track of user's hand for RPS game
 comp_score = 0      # keeps track of computer's score for RPS game
 comp_hand = ''      # keeps track of computer's hand for RPS game
 
-if not os.path.exists(Datos):
-    print('Carpeta creada ', Datos)
-    os.makedirs(Datos)
+if not os.path.exists(Data):
+    print('Creating folder ', Data)
+    os.makedirs(Data)
 
 # Number of photos taken 
 photo_of_move = 0
@@ -120,6 +121,7 @@ def scissors():
     print('comp hand: ' + comp_hand)
     return
 
+# function if players hand couldnt be detected
 def none():
     print('ERROR: UNABLE TO RETRIEVE PLAYERS HAND')
     return
@@ -232,8 +234,8 @@ def EasyMode():
         # rectangle for user to play
         cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
 
-        objeto = imAux[y1:y2, x1:x2]
-        # objeto = imutils.resize (objeto, width = 100)
+        thing = imAux[y1:y2, x1:x2]
+        # thing = imutils.resize (thing, width = 100)
         
         # extract the region of image within the user rectangle
         player_move = frame[25:300, 25:300]
@@ -294,7 +296,7 @@ def EasyMode():
                 # Save the frame
                 # cv2.imwrite('camera.jpg', frame)
                 # This will capture the image that was just in the box 
-                cv2.imwrite(Datos+'/objeto_{}.jpg'.format(photo_of_move),objeto)
+                cv2.imwrite(Data +'/thing_{}.jpg'.format(photo_of_move),thing)
 
                 ##################################################
                 ################ More New Code ###################
@@ -409,8 +411,8 @@ def HardMode():
         # rectangle for user to play
         cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
 
-        objeto = imAux[y1:y2, x1:x2]
-        # objeto = imutils.resize (objeto, width = 100)
+        thing = imAux[y1:y2, x1:x2]
+        # thing = imutils.resize (thing, width = 100)
         
         # extract the region of image within the user rectangle
         player_move = frame[25:300, 25:300]
@@ -473,7 +475,7 @@ def HardMode():
                 # Save the frame
                 # cv2.imwrite('camera.jpg', frame)
                 # This will capture the image that was just in the box 
-                cv2.imwrite(Datos+'/objeto_{}.jpg'.format(photo_of_move),objeto)
+                cv2.imwrite(Data +'/thing_{}.jpg'.format(photo_of_move),thing)
                     
                 ##################################################
                 ################ More New Code ###################
