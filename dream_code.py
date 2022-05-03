@@ -5,8 +5,9 @@
 #    Much of this file was extrapolated from https://pythonistaplanet.com/rock-paper-scissors-game-using-python-tkinter/
 #    Changes made for this project: 
 #        -Winner/Loser Comments
-#        -Not-So-Random computer hand selection
-#        -Incorporating OpenCV for Main File
+#        -Easy (random) and Hard (cheat) mode
+#        -Not-So-Random computer hand selection for Hard Mode
+#        -Incorporating OpenCV and trained model 
 #FLOW OF CODE:
 #1. create a live window and gui
 #2. player chooses easy or hard -> goes to that loop
@@ -25,7 +26,7 @@ from PIL import Image
 from PIL import ImageTk
 import cv2
 import imutils
-#from platformdirs import user_cache_dir
+from platformdirs import user_cache_dir
 import tensorflow as tf
 keras = tf.keras
 import numpy as np
@@ -120,6 +121,7 @@ def scissors():
     print('comp hand: ' + comp_hand)
     return
 
+# function if players hand couldnt be detected
 def none():
     print('ERROR: UNABLE TO RETRIEVE PLAYERS HAND')
     return
