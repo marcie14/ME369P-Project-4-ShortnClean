@@ -1,8 +1,13 @@
+#M E 369P - Team 4 - Short n' Clean 
+#Allen Hewson, Brenda Miltos, Marcie Legarde, Pranay Srivastava
+#Gather Data File:
+#    This file captures image data for use in training a model to recognize a hand playing rock paper scissors
+
+# importing required libraries
 import cv2
 import os
-# Define a function to gather data for each type
 
-cwd = os.getcwd()
+cwd = os.getcwd() # current working directory
 
 # image_type will be rock, paper, scissors, or none 
 def get_data(sample_count, image_type):
@@ -41,7 +46,7 @@ def get_data(sample_count, image_type):
   capture.release()
   cv2.destroyAllWindows
 
-# get_data(800, "rock")
-# get_data(800, "paper")
-# get_data(800, "scissors")
-# get_data(800, "none")
+# get_data(2400, "Cow")
+# get_data(2400, "Bird")
+# get_data(2400, "Snake")
+get_data(2400, "none")
