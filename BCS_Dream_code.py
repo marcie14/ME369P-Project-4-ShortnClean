@@ -34,6 +34,7 @@ from random import choice
 import time
 import os 
 import random
+import RPSEnv
 
 # We might not need this part 
 # Create folder where we can capture player's move 
@@ -45,6 +46,7 @@ user_score = 0      # keeps track of user's score for RPS game
 user_hand = ''      # keeps track of user's hand for RPS game
 comp_score = 0      # keeps track of computer's score for RPS game
 comp_hand = ''      # keeps track of computer's hand for RPS game
+medium_env = RPSEnv.RPSEnv() # initializes enviroment for medium mode
 
 if not os.path.exists(Data):
     print('Creating folder ', Data)
@@ -58,6 +60,12 @@ def choice_to_number(choice):
     print('getting choice to number: ' + choice)
     rps = {'cow':0, 'snake':1, 'bird':2}
     return rps[choice]
+
+# converts number (int) to choice (string) - used by medium mode comp_hand call
+def number_to_choice(number):
+    print('getting choice to number: ', number)
+    rps = {0:'cow', 1:'snake', 2:'bird'}
+    return rps[number]
 
 # function to decipher player move and call cow/snake/bird functions
 def player_hand(user):
@@ -90,6 +98,8 @@ def cow():
     comp_hand = ''
     if mode == 'Easy':     # Easy Mode
         comp_hand = random_computer_choice() 
+    elif mode == 'Medium':
+        comp_hand = number_to_choice(medium_env.step(choice_to_number(user_hand))[1])
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='snake'
     print('comp hand: ' + comp_hand)
@@ -103,6 +113,8 @@ def snake():
     comp_hand = ''
     if mode == 'Easy':     # Easy Mode
         comp_hand = random_computer_choice() 
+    elif mode == 'Medium':
+        comp_hand = number_to_choice(medium_env.step(choice_to_number(user_hand))[1])
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='bird'
     print('comp hand: ' + comp_hand)
@@ -116,6 +128,8 @@ def bird():
     comp_hand = ''
     if mode == 'Easy':     # Easy Mode
         comp_hand = random_computer_choice() 
+    elif mode == 'Medium':
+        comp_hand = number_to_choice(medium_env.step(choice_to_number(user_hand))[1])
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='cow'
     print('comp hand: ' + comp_hand)
@@ -129,33 +143,33 @@ def none():
 # random win statement
 def random_win_statement():
     r = random.randint(1,5)
-    match r:
-        case 1:
-            statement = 'That was all luck...'
-        case 2:
-            statement = 'You got lucky'
-        case 3:
-            statement = 'I let you win that one...'
-        case 4:
-            statement = 'Your awkward hands were\ndistracting me...'
-        case 5:
-            statement = 'You cheated!'
+    #match r:
+    if r == 1:
+        statement = 'That was all luck...'
+    elif r == 2:
+        statement = 'You got lucky'
+    elif r == 3:
+        statement = 'I let you win that one...'
+    elif r == 4:
+        statement = 'Your awkward hands were\ndistracting me...'
+    elif r == 5:
+        statement = 'You cheated!'
     return statement
 
 # random lose statement
 def random_lose_statement():
     r = random.randint(1,5)
-    match r:
-        case 1:
-            statement = 'Ha I dont even have hands\nand I won! XD'
-        case 2:
-            statement = 'Like playing against\na baby... XD'
-        case 3:
-            statement = 'You kinda suck... XD'
-        case 4:
-            statement = 'Do you even know how\nto play? XD'
-        case 5:
-            statement = 'How many times do I have to\ntell you? snake beats cow beats\nbird beats snake! XD'
+    #match r:
+    if r == 1:
+        statement = 'Ha I dont even have hands\nand I won! XD'
+    elif r == 2:
+        statement = 'Like playing against\na baby... XD'
+    elif r == 3:
+        statement = 'You kinda suck... XD'
+    elif r == 4:
+        statement = 'Do you even know how\nto play? XD'
+    elif r == 5:
+        statement = 'How many times do I have to\ntell you? snake beats cow beats\nbird beats snake! XD'
     return statement
 
 # function to process results of user and computer choices
@@ -360,6 +374,184 @@ def EasyMode():
     cap.release()
     cv2.destroyAllWindows()
 
+# function to create easy mode game
+def MediumMode():
+    '''
+    For this mode, the computer's outcome will be comepletly randomized
+
+    '''
+    print('now in ' + mode + ' mode')
+
+    global cap 
+    global user_hand
+    global comp_hand
+    global user_score
+    global user_score
+
+    model = keras.models.load_model("BCS.h5")
+
+    CLASS_MAP =  {
+        0: "cow",
+        1: "snake",
+        2: "bird",
+        3: "none"
+    }
+
+    def mapper(val):
+        return CLASS_MAP[val]
+
+    # SET THE COUNTDOWN TIMER
+    # for simplicity we set it to 3
+    # We can also take this as input
+    TIMER = int(3)
+
+    # Open the camera
+    cap = cv2.VideoCapture(0)
+    x1, y1 = 25, 25
+    x2, y2 = 300, 300 
+
+    while True:
+
+        # Read and display frame 
+        ret, frame = cap.read()
+        # cv2.imshow('a', img)  
+        if not ret:
+            continue
+        
+        imAux = frame.copy()
+        # Check for the pressed key 
+        # Waits 125 miliseconds to see if someone pressed any key 
+        # k = cv2.waitKey(125)
+
+        # rectangle for user to play
+        cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
+
+        thing = imAux[y1:y2, x1:x2]
+        # thing = imutils.resize (thing, width = 100)
+        
+        # extract the region of image within the user rectangle
+        player_move = frame[25:300, 25:300]
+        img = cv2.cvtColor(player_move, cv2.COLOR_BGR2GRAY)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        img = cv2.resize(img, (224, 224))
+        img_blur = cv2.GaussianBlur(img, (3,3), 0)
+        sobelxy = cv2.Sobel(src=img_blur, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=5)
+        # predict the move made
+        pred = model.predict(np.array([sobelxy]))
+        player_move_code = np.argmax(pred[0])
+        player_move_name = mapper(player_move_code)
+        # print(user_move_name)
+        
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
+       
+        # set the key for the countdown to begin, here we set it as s 
+        k = cv2.waitKey(10)
+        if k == ord('s'):
+            prev = time.time()
+
+            while TIMER >=0:
+                ret, img = cap.read()
+
+                # Display countdown on each frame 
+                # Specify the font and draw the coundown 
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                cv2.putText(img, str(TIMER),
+                            (200, 250), font,
+                            7, (0, 255, 255),
+                            4, cv2.LINE_AA)
+                cv2.imshow('cow snake bird', img)
+                cv2.waitKey(10)
+
+                # Current Time 
+                cur = time.time()
+
+                # Update and keep track of Countdown
+                # if time elapsed is one second
+                # than decrease the counter
+                if cur-prev >= 1:
+                    prev = cur
+                    TIMER = TIMER-1
+
+            else: 
+                ret, frame = cap.read()
+
+                # Display the clicked frame for 2
+                # sec.You can increase time in
+                # waitKey also
+                # cv2.imshow('a', img)
+                cv2.imshow('cow snake bird', frame)
+ 
+                # time for which image displayed
+                cv2.waitKey(1000)
+ 
+                # Save the frame
+                # cv2.imwrite('camera.jpg', frame)
+                # This will capture the image that was just in the box 
+                cv2.imwrite(Data +'/thing_{}.jpg'.format(photo_of_move),thing)
+
+                ##################################################
+                ################ More New Code ###################
+                # extract the region of image within the user rectangle
+                player_move = frame[25:300, 25:300]
+                img = cv2.cvtColor(player_move, cv2.COLOR_BGR2GRAY)
+                img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+                img = cv2.resize(img, (224, 224))
+                img_blur = cv2.GaussianBlur(img, (3,3), 0)
+                sobelxy = cv2.Sobel(src=img_blur, ddepth=cv2.CV_64F, dx=1, dy=1, ksize=5)
+                # predict the move made
+                pred = model.predict(np.array([sobelxy]))
+                player_move_code = np.argmax(pred[0])
+                player_move_name = mapper(player_move_code)
+                #print(player_move_name)
+                user_hand = player_move_name
+
+                # use player's hand to begin game
+                player_hand(user_hand)
+                if user_hand is not '' and user_hand is not 'none':
+                    r = result(user_hand, comp_hand) # calls on result function (returns string) 
+                else:
+                    print('please retry. now exiting game')
+                    break
+
+                print(r)
+                
+                # HERE we can reset the Countdown timer
+                # if we want more Capture without closing
+                # the camera
+
+                ######## New Code ###########
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                org = (50, 50)
+                color = (255, 0, 0)
+                # Line thickness of 2 px
+                thickness = 2
+
+                y0, dy = 50, 30
+                for i, line in enumerate(r.split('\n')):
+                    y = y0 + i*dy
+                    image = cv2.putText(frame, line, (50, y ), font, 1, color, thickness)
+
+                #image = cv2.putText(frame, r, org, font, 1, color, thickness, cv2.LINE_AA)
+
+                # cv2.waitKey(4000)
+
+                # Displaying the image
+                cv2.imshow('cow snake bird', image) 
+                cv2.waitKey(5000)
+
+                #################################################
+                TIMER = 3
+
+
+
+        elif k == ord('q'):
+            break
+        cv2.imshow("cow snake bird", frame)
+
+    cap.release()
+    cv2.destroyAllWindows()
+
 # function to create hard mode game
 def HardMode():
     '''
@@ -371,7 +563,7 @@ def HardMode():
     global user_score
     global user_score
 
-    model = keras.models.load_model("rpsedge2.h5")
+    model = keras.models.load_model("BCS.h5")
 
     print('now in ' + mode + ' mode')
 
@@ -547,6 +739,14 @@ def Easy():
     print('Entering ' + mode + ' mode')
     EasyMode()
 
+def Medium():
+    global cap 
+    global mode
+    cap = cv2.VideoCapture(0, cv2.CAP_DSHOW)
+    mode = 'Medium'
+    print('Entering ' + mode + ' mode')
+    MediumMode()
+
 # button to call on hard mode
 def Hard():
     global cap
@@ -562,8 +762,11 @@ root = Tk()
 btnEasy = Button(root, text="Easy", width=45, command=Easy)
 btnEasy.grid(column=0, row=0, padx=5, pady=5)
 
+btnMedium = Button(root, text="Medium", width=45, command=Medium)
+btnMedium.grid(column=1, row=0, padx=5, pady=5)
+
 btnHard = Button(root, text="Hard", width=45, command=Hard)
-btnHard.grid(column=1, row=0, padx=5, pady=5)
+btnHard.grid(column=2, row=0, padx=5, pady=5)
 
 lblVideo = Label(root)
 lblVideo.grid(column=0, row=1, columnspan=2)
