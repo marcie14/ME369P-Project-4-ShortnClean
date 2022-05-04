@@ -6,6 +6,7 @@
 #from gym.spaces import Discrete, Box
 import numpy as np
 import random
+from copy import copy
 
 
 class RPSEnv: #(Env):
@@ -18,30 +19,53 @@ class RPSEnv: #(Env):
         init_index = random.randint(0,2)
         self.state = [0,0,0]
         self.state[init_index] = 1
-        self.transition = [[1/3,1/3,1/3]]*3
+        self.transition = [[1/3,1/3,1/3],[1/3,1/3,1/3],[1/3,1/3,1/3]]
         self.previous_user_action = init_index
         self.prediction = self.state.index(max(self.state)) # 0, 1, 2
-        self.reward_value = 0.1
+        self.reward_value = 0.2
 
     def step(self, user_action): # apply action and return new time_step
         #value_dict = {0:'R', 1:'P', 2:'S'}
-        plays = [0,1,2]
         action_dict = {0:1, 1:2, 2:1}
 
         reward = self.reward_value if self.prediction is user_action else -self.reward_value
+        previous_row = copy(self.transition[self.previous_user_action]) # THIS IS A REFERENCE AHHH
+        #print(previous_row)
 
-        for play in plays:
+        for play in range(0,3):
+            key = True
             if play is self.prediction:
                 self.transition[self.previous_user_action][play] += reward
+                key = False
             else:
                 self.transition[self.previous_user_action][play] -= reward/2
 
-            if self.transition[self.previous_user_action][play] < 0:
-                self.transition[self.previous_user_action][play] = 0
-            elif self.transition[self.previous_user_action][play] > 1:
-                self.transition[self.previous_user_action][play] = 1
+            if not 0 <= self.transition[self.previous_user_action][play] <= 1:
+                if self.transition[self.previous_user_action][play] < 0:
+                    reward = -previous_row[play]
+                    self.transition[self.previous_user_action][play] = 0
+                elif self.transition[self.previous_user_action][play] > 1:
+                    reward = 1-previous_row[play]
+                    self.transition[self.previous_user_action][play] = 1
+                if key: reward *= -2
+                #print(reward, play)
+                
+                for i in range(0,len(previous_row)):
+                    if i < play:
+                        if i is self.prediction:
+                            reward_compare = reward
+                        else: 
+                            reward_compare = -reward/2
+                        #print(reward_compare)
 
+                        if abs(self.transition[self.previous_user_action][i]-previous_row[i]) > abs(reward_compare):
+                            self.transition[self.previous_user_action][i] = previous_row[i] + reward_compare
+
+        # print("NEW TRANSITION", self.transition)
         self.previous_user_action = user_action
+        # sums = []
+        # for row in range(0,len(self.transition)):
+        #     sums.append(sum(self.transition[row]))
         
         # markov chain operation to calculate new state and determine likely prediction
         # converting to np.arrays here as easier to work with
@@ -50,7 +74,7 @@ class RPSEnv: #(Env):
         self.prediction = self.state.index(max(self.state))
         self.action = action_dict[self.prediction]
 
-        return self.prediction, self.action
+        return self.prediction, self.action, self.previous_user_action #, sums
 
     def reset(): # return initial time step
         pass
@@ -61,15 +85,18 @@ class RPSEnv: #(Env):
 test = RPSEnv()
 #user_action = [0,1,1]
 total, correct = 0,0
-for i in range(0,1000):
-    user_action = [0,1,1,2,2,1][random.randint(0,2)] #random.randint(0,2)
+ceiling = 20
+for i in range(0,ceiling):
+    user_action = 2
+    #user_action = [0,1,1,2,2,1][random.randint(0,2)] 
+    #user_action = random.randint(0,2)
     print("User:", user_action)
     print("State:", test.state)
     print("Transition:", test.transition)
-    predicted, action = test.step(user_action)
+    predicted, action, previous = test.step(user_action)
     print("PREDICTED", predicted)
     print("COMPUTER ACTION", action)
-    #if i > 500:
+    print("USER ACTION DETECTED", previous)
     total += 1
     if user_action is predicted:
         correct = correct + 1 
