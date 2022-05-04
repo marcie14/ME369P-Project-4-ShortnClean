@@ -2,10 +2,6 @@
 # Allen Hewson, Brenda Miltos, Marcie Legarde, Pranay Srivastava
 # RPS Environment File for Reinforcement Learning
 
-# INSPIRATIONS:
-# https://towardsdatascience.com/how-to-win-over-70-matches-in-rock-paper-scissors-3e17e67e0dab
-# https://www.youtube.com/watch?v=bD6V3rcr_54
-
 #from gym import Env
 #from gym.spaces import Discrete, Box
 import numpy as np
@@ -15,8 +11,6 @@ import random
 class RPSEnv: #(Env):
     # inspo: https://www.youtube.com/watch?v=9_91p4SuiA4
     # https://github.com/koushik4/RockPaperScissors/blob/master/probabilities.py
-    # state = user throw (?)
-    # action = computer throw
     # WE MARKOVIN
 
     def __init__(self): # generate initial environment
@@ -63,24 +57,36 @@ class RPSEnv: #(Env):
 
 
 
-# # TEST
+# TEST
+test = RPSEnv()
+#user_action = [0,1,1]
+total, correct = 0,0
+for i in range(0,1000):
+    user_action = [0,1,1,2,2,1][random.randint(0,2)] #random.randint(0,2)
+    print("User:", user_action)
+    print("State:", test.state)
+    print("Transition:", test.transition)
+    predicted, action = test.step(user_action)
+    print("PREDICTED", predicted)
+    print("COMPUTER ACTION", action)
+    #if i > 500:
+    total += 1
+    if user_action is predicted:
+        correct = correct + 1 
 
-# test = RPSEnv()
-# user_action = [0,1,1]
-# for i in range(0,40):
-#     print("User:", user_action[i%3])
-#     print("State:", test.state)
-#     print("Transition:", test.transition)
-#     predicted, action = test.step(user_action[i%3])
-#     print("PREDICTED", predicted)
-#     print("COMPUTER ACTION", action)
-#     print("\n")
+    print("\n")
+
+print("\nPERCENTAGE: ",(correct/total)*100)
 
 
     # BASING OFF MARKOV CHAIN COULD BE COOL WAIT SHIT BAYES MIGHT BE BETTER GUESS IM LEARNING ALL OF STAT TODAY
 
     # state and transition matrix
 
+
+# INSPIRATIONS:
+# https://towardsdatascience.com/how-to-win-over-70-matches-in-rock-paper-scissors-3e17e67e0dab
+# https://www.youtube.com/watch?v=bD6V3rcr_54
 
 
 # class RPSEnvAnotherOne(Env):
