@@ -70,7 +70,7 @@ def player_hand(user):
         snake()
     elif user == 'bird':
         user_hand = 'bird'
-        scissors()
+        bird()
     elif user == 'none':
         user_hand = 'none'
         print("Error: computer couldn't read user's hand.")
