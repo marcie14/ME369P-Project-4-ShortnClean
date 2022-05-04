@@ -49,7 +49,6 @@ comp_hand = ''      # keeps track of computer's hand for RPS game
 medium_env = RPSEnv.RPSEnv() # initializes enviroment for medium mode
 
 if not os.path.exists(Data):
-    print('Creating folder ', Data)
     os.makedirs(Data)
 
 # Number of photos taken 
@@ -57,19 +56,16 @@ photo_of_move = 0
 
 # converts choice (string) to number (int) - used by results(user, comp) function
 def choice_to_number(choice):
-    print('getting choice to number: ' + choice)
     rps = {'cow':0, 'snake':1, 'bird':2}
     return rps[choice]
 
 # converts number (int) to choice (string) - used by medium mode comp_hand call
 def number_to_choice(number):
-    print('getting choice to number: ', number)
     rps = {0:'cow', 1:'snake', 2:'bird'}
     return rps[number]
 
 # function to decipher player move and call cow/snake/bird functions
 def player_hand(user):
-    print('user hand: ' + user)
     if user == 'cow':
         user_hand = 'cow'
         cow()
@@ -102,7 +98,6 @@ def cow():
         comp_hand = number_to_choice(medium_env.step(choice_to_number(user_hand))[1])
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='snake'
-    print('comp hand: ' + comp_hand)
     return
 
 # function to decide computer hand if user plays snake
@@ -117,7 +112,6 @@ def snake():
         comp_hand = number_to_choice(medium_env.step(choice_to_number(user_hand))[1])
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='bird'
-    print('comp hand: ' + comp_hand)
     return
 
 # function to decide computer hand if user plays bird
@@ -132,7 +126,6 @@ def bird():
         comp_hand = number_to_choice(medium_env.step(choice_to_number(user_hand))[1])
     elif mode == 'Hard':   # Hard Mode
         comp_hand ='cow'
-    print('comp hand: ' + comp_hand)
     return
 
 # function if players hand couldnt be detected
@@ -178,7 +171,6 @@ def result(user, comp):
     global comp_score
     global comp_hand
     global user_hand
-    print('getting the results')
     # convert user and comp hands to numbers
     user = choice_to_number(user)
     comp = choice_to_number(comp)
@@ -233,23 +225,18 @@ def EasyMode():
     x2, y2 = 300, 300 
 
     while True:
-
         # Read and display frame 
         ret, frame = cap.read()
-        # cv2.imshow('a', img)  
+ 
         if not ret:
             continue
         
         imAux = frame.copy()
-        # Check for the pressed key 
-        # Waits 125 miliseconds to see if someone pressed any key 
-        # k = cv2.waitKey(125)
 
         # rectangle for user to play
         cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
 
         thing = imAux[y1:y2, x1:x2]
-        # thing = imutils.resize (thing, width = 100)
         
         # extract the region of image within the user rectangle
         player_move = frame[25:300, 25:300]
@@ -262,7 +249,6 @@ def EasyMode():
         pred = model.predict(np.array([sobelxy]))
         player_move_code = np.argmax(pred[0])
         player_move_name = mapper(player_move_code)
-        # print(user_move_name)
         
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
@@ -306,14 +292,10 @@ def EasyMode():
  
                 # time for which image displayed
                 cv2.waitKey(1000)
- 
-                # Save the frame
-                # cv2.imwrite('camera.jpg', frame)
+
                 # This will capture the image that was just in the box 
                 cv2.imwrite(Data +'/thing_{}.jpg'.format(photo_of_move),thing)
 
-                ##################################################
-                ################ More New Code ###################
                 # extract the region of image within the user rectangle
                 player_move = frame[25:300, 25:300]
                 img = cv2.cvtColor(player_move, cv2.COLOR_BGR2GRAY)
@@ -325,7 +307,6 @@ def EasyMode():
                 pred = model.predict(np.array([sobelxy]))
                 player_move_code = np.argmax(pred[0])
                 player_move_name = mapper(player_move_code)
-                #print(player_move_name)
                 user_hand = player_move_name
 
                 # use player's hand to begin game
@@ -336,13 +317,6 @@ def EasyMode():
                     print('please retry. now exiting game')
                     break
 
-                print(r)
-                
-                # HERE we can reset the Countdown timer
-                # if we want more Capture without closing
-                # the camera
-
-                ######## New Code ###########
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 org = (50, 50)
                 color = (255, 0, 0)
@@ -354,15 +328,10 @@ def EasyMode():
                     y = y0 + i*dy
                     image = cv2.putText(frame, line, (50, y ), font, 1, color, thickness)
 
-                #image = cv2.putText(frame, r, org, font, 1, color, thickness, cv2.LINE_AA)
-
-                # cv2.waitKey(4000)
-
                 # Displaying the image
                 cv2.imshow('cow snake bird', image) 
                 cv2.waitKey(5000)
 
-                #################################################
                 TIMER = 3
 
 
@@ -374,7 +343,7 @@ def EasyMode():
     cap.release()
     cv2.destroyAllWindows()
 
-# function to create easy mode game
+# function to create medium mode game
 def MediumMode():
     '''
     For this mode, the computer's outcome will be comepletly randomized
@@ -411,23 +380,17 @@ def MediumMode():
     x2, y2 = 300, 300 
 
     while True:
-
         # Read and display frame 
         ret, frame = cap.read()
-        # cv2.imshow('a', img)  
         if not ret:
             continue
         
         imAux = frame.copy()
-        # Check for the pressed key 
-        # Waits 125 miliseconds to see if someone pressed any key 
-        # k = cv2.waitKey(125)
 
         # rectangle for user to play
         cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
 
         thing = imAux[y1:y2, x1:x2]
-        # thing = imutils.resize (thing, width = 100)
         
         # extract the region of image within the user rectangle
         player_move = frame[25:300, 25:300]
@@ -440,8 +403,7 @@ def MediumMode():
         pred = model.predict(np.array([sobelxy]))
         player_move_code = np.argmax(pred[0])
         player_move_name = mapper(player_move_code)
-        # print(user_move_name)
-        
+
         font = cv2.FONT_HERSHEY_SIMPLEX
         cv2.putText(frame, "Your Move: " + player_move_name, (5, 25), font, 1.2, (255, 255, 255), 2, cv2.LINE_AA)
        
@@ -476,22 +438,14 @@ def MediumMode():
             else: 
                 ret, frame = cap.read()
 
-                # Display the clicked frame for 2
-                # sec.You can increase time in
-                # waitKey also
-                # cv2.imshow('a', img)
                 cv2.imshow('cow snake bird', frame)
  
                 # time for which image displayed
                 cv2.waitKey(1000)
  
-                # Save the frame
-                # cv2.imwrite('camera.jpg', frame)
                 # This will capture the image that was just in the box 
                 cv2.imwrite(Data +'/thing_{}.jpg'.format(photo_of_move),thing)
 
-                ##################################################
-                ################ More New Code ###################
                 # extract the region of image within the user rectangle
                 player_move = frame[25:300, 25:300]
                 img = cv2.cvtColor(player_move, cv2.COLOR_BGR2GRAY)
@@ -503,7 +457,6 @@ def MediumMode():
                 pred = model.predict(np.array([sobelxy]))
                 player_move_code = np.argmax(pred[0])
                 player_move_name = mapper(player_move_code)
-                #print(player_move_name)
                 user_hand = player_move_name
 
                 # use player's hand to begin game
@@ -513,14 +466,7 @@ def MediumMode():
                 else:
                     print('please retry. now exiting game')
                     break
-
-                print(r)
                 
-                # HERE we can reset the Countdown timer
-                # if we want more Capture without closing
-                # the camera
-
-                ######## New Code ###########
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 org = (50, 50)
                 color = (255, 0, 0)
@@ -532,15 +478,10 @@ def MediumMode():
                     y = y0 + i*dy
                     image = cv2.putText(frame, line, (50, y ), font, 1, color, thickness)
 
-                #image = cv2.putText(frame, r, org, font, 1, color, thickness, cv2.LINE_AA)
-
-                # cv2.waitKey(4000)
-
                 # Displaying the image
                 cv2.imshow('cow snake bird', image) 
                 cv2.waitKey(5000)
 
-                #################################################
                 TIMER = 3
 
 
@@ -588,23 +529,17 @@ def HardMode():
     x2, y2 = 300, 300 
 
     while True:
-
         # Read and display frame 
         ret, frame = cap.read()
-        # cv2.imshow('a', img)  
         if not ret:
             continue
         
         imAux = frame.copy()
-        # Check for the pressed key 
-        # Waits 125 miliseconds to see if someone pressed any key 
-        # k = cv2.waitKey(125)
 
         # rectangle for user to play
         cv2.rectangle(frame, (25, 25), (300, 300), (255, 255, 255), 2)
 
         thing = imAux[y1:y2, x1:x2]
-        # thing = imutils.resize (thing, width = 100)
         
         # extract the region of image within the user rectangle
         player_move = frame[25:300, 25:300]
@@ -617,7 +552,6 @@ def HardMode():
         pred = model.predict(np.array([sobelxy]))
         player_move_code = np.argmax(pred[0])
         player_move_name = mapper(player_move_code)
-        # print(user_move_name)
         user_hand = player_move_name
 
 
@@ -655,10 +589,6 @@ def HardMode():
             else: 
                 ret, frame = cap.read()
 
-                # Display the clicked frame for 2
-                # sec.You can increase time in
-                # waitKey also
-                # cv2.imshow('a', img)
                 cv2.imshow('cow snake bird', frame)
  
                 # time for which image displayed
@@ -668,9 +598,7 @@ def HardMode():
                 # cv2.imwrite('camera.jpg', frame)
                 # This will capture the image that was just in the box 
                 cv2.imwrite(Data +'/thing_{}.jpg'.format(photo_of_move),thing)
-                    
-                ##################################################
-                ################ More New Code ###################
+
                 # extract the region of image within the user rectangle
                 player_move = frame[25:300, 25:300]
                 img = cv2.cvtColor(player_move, cv2.COLOR_BGR2GRAY)
@@ -682,8 +610,6 @@ def HardMode():
                 pred = model.predict(np.array([sobelxy]))
                 player_move_code = np.argmax(pred[0])
                 player_move_name = mapper(player_move_code)
-                #print(player_move_name)
-                #################################################
                 user_hand = player_move_name
 
                 # use player's hand to begin game
@@ -693,13 +619,11 @@ def HardMode():
                 else:
                     print('please retry. now exiting game')
                     break
-                print(r)
 
                 # HERE we can reset the Countdown timer
                 # if we want more Capture without closing
                 # the camera
 
-                ######## New Code ###########
                 font = cv2.FONT_HERSHEY_SIMPLEX
                 org = (50, 50)
                 color = (255, 0, 0)
@@ -710,10 +634,6 @@ def HardMode():
                 for i, line in enumerate(r.split('\n')):
                     y = y0 + i*dy
                     image = cv2.putText(frame, line, (50, y ), font, 1, color, thickness)
-
-                #image = cv2.putText(frame, r, org, font, 1, color, thickness, cv2.LINE_AA)
-
-                # cv2.waitKey(4000)
 
                 # Displaying the image
                 cv2.imshow('cow snake bird', image) 
